@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="A beautiful notebook-style shopping list you can access from any device." />
-  <title>My Shopping List 🛒</title>
+  <meta name="description" content="Uma lista de compras bonita estilo caderno que você pode acessar de qualquer dispositivo." />
+  <title>Minha Lista de Compras 🛒</title>
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#e85555" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="Shopping List" />
+  <meta name="apple-mobile-web-app-title" content="Lista de Compras" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -50,23 +50,23 @@
         <!-- Page header -->
         <header class="page-header">
           <div class="page-title-area">
-            <h1 class="page-title">Shopping List</h1>
+            <h1 class="page-title">Lista de Compras</h1>
             <span class="page-date" id="current-date"></span>
           </div>
-          <button class="clear-btn" id="clear-checked-btn" title="Remove all checked items">
-            Clear checked
+          <button class="clear-btn" id="clear-checked-btn" title="Remover todos os itens marcados">
+            Limpar marcados
           </button>
         </header>
 
         <!-- Item list -->
-        <ul class="item-list" id="item-list" aria-label="Shopping list items">
+        <ul class="item-list" id="item-list" aria-label="Itens da lista de compras">
           <!-- Items injected by JS -->
         </ul>
 
         <!-- Empty state -->
         <div class="empty-state" id="empty-state" aria-live="polite">
           <span class="empty-icon">🛒</span>
-          <p>Your list is empty.<br/>Add your first item below!</p>
+          <p>Sua lista está vazia.<br/>Adicione seu primeiro item abaixo!</p>
         </div>
 
         <!-- Add item row -->
@@ -76,14 +76,14 @@
             type="text"
             id="new-item-input"
             class="new-item-input"
-            placeholder="Add an item…"
+            placeholder="Adicionar item…"
             maxlength="80"
             autocomplete="off"
             autocorrect="off"
             spellcheck="false"
-            aria-label="New item text"
+            aria-label="Texto do novo item"
           />
-          <button class="add-btn" id="add-btn" aria-label="Add item">
+          <button class="add-btn" id="add-btn" aria-label="Adicionar item">
             <span class="add-btn-icon">+</span>
           </button>
         </div>
@@ -92,7 +92,7 @@
     </div><!-- /notebook -->
 
     <!-- Footer hint -->
-    <p class="footer-hint">Tap ✓ to check &nbsp;·&nbsp; Swipe or tap ✕ to remove</p>
+    <p class="footer-hint">Toque ✓ para marcar &nbsp;·&nbsp; Toque ✕ para remover</p>
 
   </div><!-- /desk-surface -->
 

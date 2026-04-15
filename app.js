@@ -21,7 +21,7 @@
   // ── Init ────────────────────────────────────────────────────
   function init() {
     // Show today's date on the page
-    dateEl.textContent = new Date().toLocaleDateString('en-US', {
+    dateEl.textContent = new Date().toLocaleDateString('pt-BR', {
       weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
     });
 
@@ -92,7 +92,7 @@
     cb.type = 'checkbox';
     cb.className = 'item-checkbox';
     cb.checked = item.checked;
-    cb.setAttribute('aria-label', `Mark "${item.text}" as ${item.checked ? 'un' : ''}done`);
+    cb.setAttribute('aria-label', `Marcar "${item.text}" como ${item.checked ? 'não ' : ''}feito`);
     cb.addEventListener('change', () => toggleItem(item.id));
 
     // Text
@@ -104,7 +104,7 @@
     const del = document.createElement('button');
     del.className = 'item-delete';
     del.innerHTML = '✕';
-    del.setAttribute('aria-label', `Remove "${item.text}"`);
+    del.setAttribute('aria-label', `Remover "${item.text}"`);
     del.addEventListener('click', () => removeItemAnimated(item.id, li));
 
     li.appendChild(cb);
@@ -153,7 +153,7 @@
 
     // Update aria-label on checkbox
     const cb = li && li.querySelector('.item-checkbox');
-    if (cb) cb.setAttribute('aria-label', `Mark "${item.text}" as ${item.checked ? 'un' : ''}done`);
+    if (cb) cb.setAttribute('aria-label', `Marcar "${item.text}" como ${item.checked ? 'não ' : ''}feito`);
 
     updateUI();
   }
