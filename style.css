@@ -1,0 +1,538 @@
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+  /* Paper */
+  --paper-bg:        #fdf8f0;
+  --paper-line:      #c9d4e0;
+  --paper-line-h:    40px;       /* height of each ruled line */
+  --margin-line:     #e85555;
+  --margin-offset:   72px;
+
+  /* Notebook chrome */
+  --notebook-shadow: 0 8px 40px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.18);
+  --spiral-color:    #8a8a8a;
+  --spiral-bg:       #d0d0d0;
+
+  /* Desk */
+  --desk-bg:         #b5895a;
+  --desk-grain:      rgba(0,0,0,0.07);
+
+  /* Text */
+  --ink:             #2a2a38;
+  --ink-light:       #888;
+  --checked-ink:     #b0a898;
+
+  /* Accents */
+  --red:             #e85555;
+  --red-hover:       #c43b3b;
+  --green:           #4caf78;
+  --green-hover:     #389a5e;
+
+  /* Transitions */
+  --ease:            cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out:        cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100%;
+  font-family: 'Caveat', cursive;
+  background-color: var(--desk-bg);
+  /* Wood grain texture */
+  background-image:
+    repeating-linear-gradient(
+      92deg,
+      var(--desk-grain) 0px,
+      transparent 2px,
+      transparent 60px,
+      var(--desk-grain) 62px
+    ),
+    repeating-linear-gradient(
+      182deg,
+      rgba(255,255,255,0.03) 0px,
+      transparent 3px,
+      transparent 120px
+    );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 32px 12px 48px;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   DESK SURFACE
+   ============================================================ */
+.desk-surface {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+/* ============================================================
+   NOTEBOOK
+   ============================================================ */
+.notebook {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  border-radius: 4px 12px 12px 4px;
+  box-shadow: var(--notebook-shadow);
+  overflow: hidden;
+  position: relative;
+  animation: drop-in 0.55s var(--ease-out) both;
+}
+
+@keyframes drop-in {
+  from { opacity: 0; transform: translateY(-24px) rotate(-1.5deg); }
+  to   { opacity: 1; transform: translateY(0) rotate(0deg); }
+}
+
+/* ============================================================
+   SPIRAL BINDING
+   ============================================================ */
+.spiral-binding {
+  width: 28px;
+  min-width: 28px;
+  background: linear-gradient(to right, #4a4a4a, #777 40%, #4a4a4a);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  padding: 18px 0;
+  gap: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.spiral-hole {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, var(--spiral-bg), var(--spiral-color));
+  box-shadow:
+    inset 0 2px 3px rgba(0,0,0,0.5),
+    0 1px 2px rgba(255,255,255,0.25);
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   PAGE
+   ============================================================ */
+.page {
+  flex: 1;
+  min-width: 0;
+  background-color: var(--paper-bg);
+  /* Ruled lines */
+  background-image:
+    /* Margin line */
+    linear-gradient(
+      to right,
+      transparent var(--margin-offset),
+      var(--margin-line) var(--margin-offset),
+      var(--margin-line) calc(var(--margin-offset) + 1.5px),
+      transparent calc(var(--margin-offset) + 1.5px)
+    ),
+    /* Ruled horizontal lines */
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent calc(var(--paper-line-h) - 1px),
+      var(--paper-line) calc(var(--paper-line-h) - 1px),
+      var(--paper-line) var(--paper-line-h)
+    );
+  background-attachment: local;
+  padding: 0 0 32px 0;
+  position: relative;
+  /* Subtle page curl on bottom-right */
+  border-radius: 0 12px 12px 0;
+}
+
+/* Page curl effect */
+.page::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(
+    225deg,
+    #e8e0d5 45%,
+    rgba(180,160,130,0.4) 50%,
+    transparent 60%
+  );
+  border-radius: 0 0 12px 0;
+  pointer-events: none;
+}
+
+/* ============================================================
+   PAGE HEADER
+   ============================================================ */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 4px calc(var(--margin-offset) + 14px);
+  min-height: var(--paper-line-h);
+  border-bottom: none;
+  gap: 8px;
+}
+
+.page-title-area {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.page-title {
+  font-family: 'Caveat', cursive;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--red);
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.page-date {
+  font-family: 'Patrick Hand', cursive;
+  font-size: 0.8rem;
+  color: var(--ink-light);
+  margin-top: 2px;
+}
+
+.clear-btn {
+  font-family: 'Patrick Hand', cursive;
+  font-size: 0.78rem;
+  color: var(--red);
+  background: transparent;
+  border: 1.5px solid var(--red);
+  border-radius: 20px;
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.18s, color 0.18s, transform 0.15s var(--ease);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.clear-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.clear-btn:hover {
+  background: var(--red);
+  color: #fff;
+  transform: scale(1.04);
+}
+
+.clear-btn:active { transform: scale(0.97); }
+
+/* ============================================================
+   ITEM LIST
+   ============================================================ */
+.item-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  min-height: var(--paper-line-h);
+  padding: 0 12px 0 calc(var(--margin-offset) + 14px);
+  gap: 10px;
+  position: relative;
+  animation: slide-in 0.35s var(--ease) both;
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(-18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.item.removing {
+  animation: slide-out 0.3s var(--ease-out) forwards;
+}
+
+@keyframes slide-out {
+  to { opacity: 0; transform: translateX(40px); max-height: 0; min-height: 0; padding: 0; }
+}
+
+/* ---- Checkbox ---- */
+.item-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border: 2px solid #aab0bb;
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
+  position: relative;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s var(--ease);
+}
+
+.item-checkbox:hover {
+  border-color: var(--green);
+  transform: scale(1.1);
+}
+
+.item-checkbox:checked {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+/* Checkmark drawn with pseudo-element */
+.item-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 8px;
+  width: 5px;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+  transform: rotate(45deg) translate(-1px, -1px);
+  box-shadow: 2px -2px 0 #fff, 4px -4px 0 #fff, 6px -6px 0 #fff;
+  animation: check-draw 0.25s var(--ease) both;
+}
+
+@keyframes check-draw {
+  from { opacity: 0; transform: rotate(40deg) scale(0.5); }
+  to   { opacity: 1; transform: rotate(45deg) translate(-1px, -1px) scale(1); }
+}
+
+/* ---- Item text ---- */
+.item-text {
+  flex: 1;
+  font-family: 'Caveat', cursive;
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.2;
+  word-break: break-word;
+  transition: color 0.3s, opacity 0.3s;
+  position: relative;
+}
+
+.item.checked .item-text {
+  color: var(--checked-ink);
+  opacity: 0.7;
+}
+
+/* Strikethrough line drawn with pseudo-element */
+.item-text::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 1.5px;
+  background: var(--checked-ink);
+  border-radius: 2px;
+  transform-origin: left center;
+  transition: transform 0.35s var(--ease-out), opacity 0.25s;
+  transform: scaleX(0) translateY(-50%);
+  opacity: 0;
+}
+
+.item.checked .item-text::after {
+  transform: scaleX(1) translateY(-50%);
+  opacity: 1;
+}
+
+/* ---- Delete button ---- */
+.item-delete {
+  background: transparent;
+  border: none;
+  color: var(--red);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.15s, transform 0.15s var(--ease);
+  flex-shrink: 0;
+}
+
+.item:hover .item-delete,
+.item:focus-within .item-delete {
+  opacity: 1;
+}
+
+/* Always show on touch devices */
+@media (hover: none) {
+  .item-delete { opacity: 0.45; }
+}
+
+.item-delete:hover {
+  background: rgba(232, 85, 85, 0.12);
+  transform: scale(1.2);
+  opacity: 1;
+}
+
+.item-delete:active { transform: scale(0.9); }
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+.empty-state {
+  text-align: center;
+  padding: 32px 16px 16px calc(var(--margin-offset) - 16px);
+  color: var(--ink-light);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1rem;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: fade-in 0.4s ease both;
+}
+
+.empty-state.hidden { display: none; }
+
+.empty-icon {
+  font-size: 2.4rem;
+  animation: sway 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes sway {
+  from { transform: rotate(-8deg); }
+  to   { transform: rotate(8deg); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   ADD ROW
+   ============================================================ */
+.add-row {
+  display: flex;
+  align-items: center;
+  min-height: var(--paper-line-h);
+  padding: 4px 12px 4px calc(var(--margin-offset) + 14px);
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.add-checkbox-placeholder {
+  width: 20px;
+  min-width: 20px;
+  height: 20px;
+  border: 2px dashed #ccd0d8;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.new-item-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px dashed #c0c8d0;
+  font-family: 'Caveat', cursive;
+  font-size: 1.25rem;
+  color: var(--ink);
+  padding: 2px 4px;
+  outline: none;
+  min-width: 0;
+  transition: border-color 0.2s;
+}
+
+.new-item-input::placeholder {
+  color: #bec6ce;
+  font-style: italic;
+}
+
+.new-item-input:focus {
+  border-bottom-color: var(--red);
+}
+
+.add-btn {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 50%;
+  background: var(--red);
+  color: #fff;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 8px rgba(232, 85, 85, 0.4);
+  transition: background 0.18s, transform 0.15s var(--ease), box-shadow 0.18s;
+  flex-shrink: 0;
+}
+
+.add-btn:hover {
+  background: var(--red-hover);
+  transform: scale(1.12) rotate(90deg);
+  box-shadow: 0 5px 14px rgba(232, 85, 85, 0.5);
+}
+
+.add-btn:active { transform: scale(0.95) rotate(90deg); }
+
+.add-btn-icon {
+  display: block;
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   FOOTER HINT
+   ============================================================ */
+.footer-hint {
+  font-family: 'Patrick Hand', cursive;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.55);
+  text-align: center;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  animation: fade-in 1s 0.6s ease both;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 380px) {
+  :root { --margin-offset: 54px; --paper-line-h: 44px; }
+  .page-title { font-size: 1.6rem; }
+  .item-text, .new-item-input { font-size: 1.15rem; }
+}
+
+@media (min-width: 521px) {
+  body { padding-top: 48px; }
+  .notebook { border-radius: 4px 16px 16px 4px; }
+}
+
+/* ============================================================
+   SCROLLBAR (webkit)
+   ============================================================ */
+.page::-webkit-scrollbar { width: 6px; }
+.page::-webkit-scrollbar-track { background: transparent; }
+.page::-webkit-scrollbar-thumb { background: #d0c8b8; border-radius: 3px; }

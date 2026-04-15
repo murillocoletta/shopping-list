@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A beautiful notebook-style shopping list you can access from any device." />
+  <title>My Shopping List 🛒</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#e85555" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Shopping List" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Page background / desk surface -->
+  <div class="desk-surface">
+
+    <!-- Notebook -->
+    <div class="notebook" role="main">
+
+      <!-- Spiral binding -->
+      <div class="spiral-binding" aria-hidden="true">
+        <div class="spiral-hole"></div>
+        <div class="spiral-hole"></div>
+        <div class="spiral-hole"></div>
+        <div class="spiral-hole"></div>
+        <div class="spiral-hole"></div>
+        <div class="spiral-hole"></div>
+        <div class="spiral-hole"></div>
+        <div class="spiral-hole"></div>
+        <div class="spiral-hole"></div>
+        <div class="spiral-hole"></div>
+        <div class="spiral-hole"></div>
+        <div class="spiral-hole"></div>
+      </div>
+
+      <!-- Notebook page -->
+      <div class="page">
+
+        <!-- Page header -->
+        <header class="page-header">
+          <div class="page-title-area">
+            <h1 class="page-title">Shopping List</h1>
+            <span class="page-date" id="current-date"></span>
+          </div>
+          <button class="clear-btn" id="clear-checked-btn" title="Remove all checked items">
+            Clear checked
+          </button>
+        </header>
+
+        <!-- Item list -->
+        <ul class="item-list" id="item-list" aria-label="Shopping list items">
+          <!-- Items injected by JS -->
+        </ul>
+
+        <!-- Empty state -->
+        <div class="empty-state" id="empty-state" aria-live="polite">
+          <span class="empty-icon">🛒</span>
+          <p>Your list is empty.<br/>Add your first item below!</p>
+        </div>
+
+        <!-- Add item row -->
+        <div class="add-row">
+          <div class="add-checkbox-placeholder" aria-hidden="true"></div>
+          <input
+            type="text"
+            id="new-item-input"
+            class="new-item-input"
+            placeholder="Add an item…"
+            maxlength="80"
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+            aria-label="New item text"
+          />
+          <button class="add-btn" id="add-btn" aria-label="Add item">
+            <span class="add-btn-icon">+</span>
+          </button>
+        </div>
+
+      </div><!-- /page -->
+    </div><!-- /notebook -->
+
+    <!-- Footer hint -->
+    <p class="footer-hint">Tap ✓ to check &nbsp;·&nbsp; Swipe or tap ✕ to remove</p>
+
+  </div><!-- /desk-surface -->
+
+  <script src="app.js"></script>
+</body>
+</html>
