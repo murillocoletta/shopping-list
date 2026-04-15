@@ -1,78 +1,81 @@
 /**
  * app.js — Shopping List Logic
- * Handles: add / toggle / delete / persist (localStorage)
+ * Dados sincronizados em tempo real via Firebase Realtime Database.
+ * Qualquer pessoa com o link vê as mesmas alterações instantaneamente.
  */
 
 (function () {
   'use strict';
 
   // ── DOM refs ────────────────────────────────────────────────
-  const list        = document.getElementById('item-list');
-  const input       = document.getElementById('new-item-input');
-  const addBtn      = document.getElementById('add-btn');
-  const clearBtn    = document.getElementById('clear-checked-btn');
-  const emptyState  = document.getElementById('empty-state');
-  const dateEl      = document.getElementById('current-date');
+  const list       = document.getElementById('item-list');
+  const input      = document.getElementById('new-item-input');
+  const addBtn     = document.getElementById('add-btn');
+  const clearBtn   = document.getElementById('clear-checked-btn');
+  const emptyState = document.getElementById('empty-state');
+  const dateEl     = document.getElementById('current-date');
 
-  // ── State ───────────────────────────────────────────────────
-  const STORAGE_KEY = 'shopping-list-items';
-  let items = [];   // [{ id, text, checked }]
+  // ── Firebase ─────────────────────────────────────────────────
+  // `firebase` é inicializado pelo firebase-config.js, carregado antes deste arquivo.
+  const db       = firebase.database();
+  const itemsRef = db.ref('items');   // raiz do banco de dados: /items
+
+  // ── Estado local ─────────────────────────────────────────────
+  // Espelho dos dados do Firebase; atualizado a cada snapshot.
+  let items = [];   // [{ id, text, checked, createdAt }]
 
   // ── Init ────────────────────────────────────────────────────
   function init() {
-    // Show today's date on the page
+    // Exibir a data de hoje no cabeçalho
     dateEl.textContent = new Date().toLocaleDateString('pt-BR', {
       weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
     });
 
-    // Load persisted items
-    loadItems();
-    renderAll();
+    // Mostrar indicador de carregamento até o Firebase responder
+    showStatus('Conectando…');
 
-    // Event listeners
+    // Escuta em tempo real: sempre que alguém alterar o banco,
+    // esta função é chamada automaticamente em todos os dispositivos.
+    itemsRef.orderByChild('createdAt').on('value', snapshot => {
+      hideStatus();
+      items = [];
+      snapshot.forEach(child => {
+        items.push({ id: child.key, ...child.val() });
+      });
+      renderAll();
+    }, _err => {
+      showStatus('Sem conexão. Tente novamente.');
+    });
+
+    // Botões
     addBtn.addEventListener('click', handleAdd);
     input.addEventListener('keydown', e => {
       if (e.key === 'Enter') handleAdd();
     });
     clearBtn.addEventListener('click', handleClearChecked);
 
-    // Register service worker
+    // Registrar service worker (offline shell)
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').catch(() => {
-        // silently fail if SW is unavailable (e.g. file:// protocol)
-      });
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
   }
 
-  // ── Storage ─────────────────────────────────────────────────
-  function loadItems() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      items = raw ? JSON.parse(raw) : [];
-    } catch {
-      items = [];
+  // ── Status helpers ───────────────────────────────────────────
+  function showStatus(msg) {
+    let el = document.getElementById('status-msg');
+    if (!el) {
+      el = document.createElement('p');
+      el.id = 'status-msg';
+      el.style.cssText = 'text-align:center;font-family:var(--font-hand,sans-serif);color:#888;padding:8px 0;font-size:0.9rem;';
+      emptyState.after(el);
     }
+    el.textContent = msg;
+    el.style.display = 'block';
   }
 
-  function saveItems() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    } catch {
-      // Storage full or unavailable — no crash
-    }
-  }
-
-  // ── Helpers ─────────────────────────────────────────────────
-  function generateId() {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  }
-
-  function updateUI() {
-    const hasItems   = items.length > 0;
-    const hasChecked = items.some(i => i.checked);
-    emptyState.classList.toggle('hidden', hasItems);
-    clearBtn.classList.toggle('visible', hasChecked);
-    saveItems();
+  function hideStatus() {
+    const el = document.getElementById('status-msg');
+    if (el) el.style.display = 'none';
   }
 
   // ── Render ──────────────────────────────────────────────────
@@ -93,14 +96,14 @@
     cb.className = 'item-checkbox';
     cb.checked = item.checked;
     cb.setAttribute('aria-label', `Marcar "${item.text}" como ${item.checked ? 'não ' : ''}feito`);
-    cb.addEventListener('change', () => toggleItem(item.id));
+    cb.addEventListener('change', () => toggleItem(item.id, !item.checked));
 
-    // Text
+    // Texto
     const span = document.createElement('span');
     span.className = 'item-text';
     span.textContent = item.text;
 
-    // Delete button
+    // Botão remover
     const del = document.createElement('button');
     del.className = 'item-delete';
     del.innerHTML = '✕';
@@ -114,11 +117,19 @@
     return li;
   }
 
-  // ── Actions ─────────────────────────────────────────────────
+  // ── Helpers de UI ────────────────────────────────────────────
+  function updateUI() {
+    const hasItems   = items.length > 0;
+    const hasChecked = items.some(i => i.checked);
+    emptyState.classList.toggle('hidden', hasItems);
+    clearBtn.classList.toggle('visible', hasChecked);
+  }
+
+  // ── Ações ────────────────────────────────────────────────────
   function handleAdd() {
     const text = input.value.trim();
     if (!text) {
-      // Shake the input to signal "empty"
+      // Agita o campo para indicar que está vazio
       input.animate(
         [{ transform: 'translateX(-6px)' }, { transform: 'translateX(6px)' },
          { transform: 'translateX(-4px)' }, { transform: 'translateX(4px)' },
@@ -129,41 +140,26 @@
       return;
     }
 
-    const newItem = { id: generateId(), text, checked: false };
-    items.push(newItem);
-
-    const el = createItemEl(newItem);
-    list.appendChild(el);
+    // Publicar no Firebase → o listener onValue vai re-renderizar em todos os dispositivos
+    itemsRef.push({
+      text,
+      checked:   false,
+      createdAt: Date.now()
+    });
 
     input.value = '';
     input.focus();
-    updateUI();
-
-    // Scroll new item into view smoothly
-    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  function toggleItem(id) {
-    const item = items.find(i => i.id === id);
-    if (!item) return;
-    item.checked = !item.checked;
-
-    const li = list.querySelector(`[data-id="${id}"]`);
-    if (li) li.classList.toggle('checked', item.checked);
-
-    // Update aria-label on checkbox
-    const cb = li && li.querySelector('.item-checkbox');
-    if (cb) cb.setAttribute('aria-label', `Marcar "${item.text}" como ${item.checked ? 'não ' : ''}feito`);
-
-    updateUI();
+  function toggleItem(id, checked) {
+    // Atualizar apenas o campo `checked` deste item no Firebase
+    itemsRef.child(id).update({ checked });
   }
 
   function removeItemAnimated(id, li) {
     li.classList.add('removing');
     li.addEventListener('animationend', () => {
-      items = items.filter(i => i.id !== id);
-      li.remove();
-      updateUI();
+      itemsRef.child(id).remove();
     }, { once: true });
   }
 
@@ -171,17 +167,12 @@
     const toRemove = list.querySelectorAll('.item.checked');
     if (!toRemove.length) return;
 
-    let removed = 0;
     toRemove.forEach((li, idx) => {
-      // Stagger the slide-out animations
       setTimeout(() => {
         const id = li.dataset.id;
         li.classList.add('removing');
         li.addEventListener('animationend', () => {
-          items = items.filter(i => i.id !== id);
-          li.remove();
-          removed++;
-          if (removed === toRemove.length) updateUI();
+          itemsRef.child(id).remove();
         }, { once: true });
       }, idx * 60);
     });
