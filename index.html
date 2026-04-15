@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Uma lista de compras bonita estilo caderno que você pode acessar de qualquer dispositivo." />
-  <title>Minha Lista de Compras 🛒</title>
+  <meta name="description" content="Minhas listas de compras — acessível de qualquer dispositivo, sincronizada em tempo real." />
+  <title>Minhas Listas 🛒</title>
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#e85555" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="Lista de Compras" />
+  <meta name="apple-mobile-web-app-title" content="Minhas Listas" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -22,85 +22,157 @@
 </head>
 <body>
 
-  <!-- Page background / desk surface -->
-  <div class="desk-surface">
+  <!-- ══════════════════════════════════════════
+       TELA HOME — Cards das listas
+       ══════════════════════════════════════════ -->
+  <div class="screen" id="screen-home">
+    <div class="desk-surface">
 
-    <!-- Notebook -->
-    <div class="notebook" role="main">
+      <header class="app-header">
+        <h1 class="app-title">Minhas Listas</h1>
+        <p class="app-subtitle" id="app-date"></p>
+      </header>
 
-      <!-- Spiral binding -->
-      <div class="spiral-binding" aria-hidden="true">
-        <div class="spiral-hole"></div>
-        <div class="spiral-hole"></div>
-        <div class="spiral-hole"></div>
-        <div class="spiral-hole"></div>
-        <div class="spiral-hole"></div>
-        <div class="spiral-hole"></div>
-        <div class="spiral-hole"></div>
-        <div class="spiral-hole"></div>
-        <div class="spiral-hole"></div>
-        <div class="spiral-hole"></div>
-        <div class="spiral-hole"></div>
-        <div class="spiral-hole"></div>
+      <!-- Grid de cards -->
+      <div class="lists-grid" id="lists-grid">
+        <!-- Cards injetados pelo JS -->
       </div>
 
-      <!-- Notebook page -->
-      <div class="page">
+      <!-- Estado vazio (sem listas) -->
+      <div class="home-empty hidden" id="home-empty">
+        <span class="empty-icon">📝</span>
+        <p>Nenhuma lista ainda.<br/>Crie sua primeira lista abaixo!</p>
+      </div>
 
-        <!-- Page header -->
-        <header class="page-header">
-          <div class="page-title-area">
-            <h1 class="page-title">Lista de Compras</h1>
-            <span class="page-date" id="current-date"></span>
+      <!-- Botão nova lista -->
+      <button class="new-list-btn" id="new-list-btn" aria-label="Criar nova lista">
+        <span class="new-list-btn__icon">+</span>
+        <span>Nova Lista</span>
+      </button>
+
+      <p class="footer-hint">Toque em uma lista para abrir &nbsp;·&nbsp; Toque ✕ para excluir</p>
+
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       TELA LISTA — Caderno
+       ══════════════════════════════════════════ -->
+  <div class="screen screen--hidden" id="screen-list">
+    <div class="desk-surface">
+
+      <!-- Botão voltar (fora do caderno, sobre a "mesa") -->
+      <button class="back-btn" id="back-btn" aria-label="Voltar para as listas">
+        ← Voltar
+      </button>
+
+      <!-- Notebook -->
+      <div class="notebook" role="main">
+
+        <!-- Espiral -->
+        <div class="spiral-binding" aria-hidden="true">
+          <div class="spiral-hole"></div>
+          <div class="spiral-hole"></div>
+          <div class="spiral-hole"></div>
+          <div class="spiral-hole"></div>
+          <div class="spiral-hole"></div>
+          <div class="spiral-hole"></div>
+          <div class="spiral-hole"></div>
+          <div class="spiral-hole"></div>
+          <div class="spiral-hole"></div>
+          <div class="spiral-hole"></div>
+          <div class="spiral-hole"></div>
+          <div class="spiral-hole"></div>
+        </div>
+
+        <!-- Página -->
+        <div class="page">
+
+          <!-- Cabeçalho -->
+          <header class="page-header">
+            <div class="page-title-area">
+              <h2 class="page-title" id="list-title">Lista</h2>
+              <span class="page-date" id="current-date"></span>
+            </div>
+            <button class="clear-btn" id="clear-checked-btn" title="Remover todos os itens marcados">
+              Limpar marcados
+            </button>
+          </header>
+
+          <!-- Itens -->
+          <ul class="item-list" id="item-list" aria-label="Itens da lista de compras">
+            <!-- Itens injetados pelo JS -->
+          </ul>
+
+          <!-- Estado vazio -->
+          <div class="empty-state" id="empty-state" aria-live="polite">
+            <span class="empty-icon">🛒</span>
+            <p>Sua lista está vazia.<br/>Adicione seu primeiro item abaixo!</p>
           </div>
-          <button class="clear-btn" id="clear-checked-btn" title="Remover todos os itens marcados">
-            Limpar marcados
-          </button>
-        </header>
 
-        <!-- Item list -->
-        <ul class="item-list" id="item-list" aria-label="Itens da lista de compras">
-          <!-- Items injected by JS -->
-        </ul>
+          <!-- Adicionar item -->
+          <div class="add-row">
+            <div class="add-checkbox-placeholder" aria-hidden="true"></div>
+            <input
+              type="text"
+              id="new-item-input"
+              class="new-item-input"
+              placeholder="Adicionar item…"
+              maxlength="80"
+              autocomplete="off"
+              autocorrect="off"
+              spellcheck="false"
+              aria-label="Texto do novo item"
+            />
+            <button class="add-btn" id="add-btn" aria-label="Adicionar item">
+              <span class="add-btn-icon">+</span>
+            </button>
+          </div>
 
-        <!-- Empty state -->
-        <div class="empty-state" id="empty-state" aria-live="polite">
-          <span class="empty-icon">🛒</span>
-          <p>Sua lista está vazia.<br/>Adicione seu primeiro item abaixo!</p>
-        </div>
+        </div><!-- /page -->
+      </div><!-- /notebook -->
 
-        <!-- Add item row -->
-        <div class="add-row">
-          <div class="add-checkbox-placeholder" aria-hidden="true"></div>
-          <input
-            type="text"
-            id="new-item-input"
-            class="new-item-input"
-            placeholder="Adicionar item…"
-            maxlength="80"
-            autocomplete="off"
-            autocorrect="off"
-            spellcheck="false"
-            aria-label="Texto do novo item"
-          />
-          <button class="add-btn" id="add-btn" aria-label="Adicionar item">
-            <span class="add-btn-icon">+</span>
-          </button>
-        </div>
+      <p class="footer-hint">Toque ✓ para marcar &nbsp;·&nbsp; Toque ✕ para remover</p>
 
-      </div><!-- /page -->
-    </div><!-- /notebook -->
+    </div>
+  </div>
 
-    <!-- Footer hint -->
-    <p class="footer-hint">Toque ✓ para marcar &nbsp;·&nbsp; Toque ✕ para remover</p>
 
-  </div><!-- /desk-surface -->
+  <!-- ══════════════════════════════════════════
+       MODAL — Nova Lista
+       ══════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-label="Criar nova lista">
+    <div class="modal">
+      <h2 class="modal-title">Nova Lista</h2>
+
+      <p class="modal-label">Escolha um ícone:</p>
+      <div class="emoji-picker" id="emoji-picker" role="listbox" aria-label="Ícones disponíveis"></div>
+
+      <p class="modal-label">Nome da lista:</p>
+      <input
+        type="text"
+        id="list-name-input"
+        class="list-name-input"
+        placeholder="Ex: Mercado, Farmácia…"
+        maxlength="30"
+        autocomplete="off"
+        aria-label="Nome da nova lista"
+      />
+
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn--cancel" id="modal-cancel">Cancelar</button>
+        <button class="modal-btn modal-btn--save"   id="modal-save">Criar Lista</button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Firebase SDK (compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
-  <!-- Suas credenciais Firebase (preencha após criar o projeto) -->
+  <!-- Credenciais Firebase -->
   <script src="firebase-config.js"></script>
 
   <script src="app.js"></script>

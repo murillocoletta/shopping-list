@@ -1,7 +1,7 @@
 {
-  "name": "Minha Lista de Compras",
-  "short_name": "Lista de Compras",
-  "description": "Uma lista de compras estilo caderno acessível de qualquer dispositivo.",
+  "name": "Minhas Listas",
+  "short_name": "Minhas Listas",
+  "description": "Suas listas de compras estilo caderno acessíveis de qualquer dispositivo.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#c8a97a",
